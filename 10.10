@@ -43,3 +43,12 @@ else
     echo "Ciphers aes128-ctr,aes192-ctr,aes256-ctr" >> /etc/ssh/sshd_config
     printf "\e[32mOnly approved cipher is used in counter mode\e[0m\n"       
 fi
+
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
