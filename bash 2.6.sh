@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #2.6
+
 printf "\e[1mDisable chargen-dgram\e[0m\n"
 if yum list xinetd | grep "Available Packages" >/dev/null ; then
 	printf "\e[32mAlready removed Chargen-Dgram from removing Xinetd.\e[0m\n"
@@ -49,5 +50,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
