@@ -1,0 +1,21 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}7.9 Verify No Legacy "+" Entries Exist in /etc/passwd, /etc/shadow and /etc/group files${normal} \n\n"
+#Checks Legacy Entries for '^+:'
+printf "Checking that no Legacy Entries exist in etc/passwd, /etc/shadow and /etc/group files\n"
+PASSWD=$(grep '^+:' /etc/passwd)
+SHADOW=$(grep '^+:' /etc/shadow)
+GROUP=$(grep '^+:' /etc/group)
+#echo $PASSWD
+#echo $SHADOW
+#echo $GROUP
+#Checks that there is no output for all accounts
+if [ -z "$PASSWD" ] && [ -z "$SHADOW" ] && [ -z "$GROUP" ]; then
+	printf "\033[33;32m PASS \n"
+else
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
