@@ -1,0 +1,60 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}8.1 Set Warning Banner for Standard Login Services${normal} \n\n"
+#Set counter to 0 and cut user and group of /etc/motd, /etc/issue and /etc/issue.net
+counter=0
+motdper=$(ls -l /etc/motd | cut -d " " -f 3 )
+motdper1=$(ls -l /etc/motd | cut -d " " -f 4 )
+issueper=$(ls -l /etc/issue | cut -d " " -f 3 )
+issueper1=$(ls -l /etc/issue | cut -d " " -f 4 )
+issuenetper=$(ls -l /etc/issue.net | cut -d " " -f 3 )
+issuenetper1=$(ls -l /etc/issue.net | cut -d " " -f 4 )
+#Checks if all are set as root 
+printf "Checking that /etc/motd /etc/issue /etc/issue.net have root as user and group:\n"
+if [ "$motdper" == "root" ] && [ "$motdper1" == "root" ] && [ "$issueper" == "root" ] && [ "$issueper1" == "root" ] && [ "$issuenetper" == "root" ] && [ "$issuenetper1" == "root" ]
+then 
+	printf "\033[33;32m PASS \n"
+else
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+
+fi
+echo  -en "\e[0m"
+#chmod of the 3 files
+chmodmotd=$( stat --format '%a' /etc/motd)
+chmodissue=$( stat --format '%a' /etc/issue)
+chmodissuenet=$( stat --format '%a' /etc/issue.net)
+#Checks if all files' chmod equals 644
+printf "Checking that /etc/motd /etc/issue /etc/issue.net have chmod of 644 :\n"
+if [ "$chmodmotd" -eq 644 ] && [ "$chmodissue" -eq 644 ] && [ "$chmodissuenet" -eq 644 ]
+then 
+	printf "\033[33;32m PASS \n"
+else	
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+#Checks if correct banner is set in issue and issue.net
+mp="Authorized uses only. All activity may be \ monitored and reported."
+catissue=$(cat /etc/issue)
+catissuenet=$(cat /etc/issue.net)
+printf "Checking that /etc/issue /etc/issue.net have proper motd :\n"
+if [ "$catissue" == "$mp" ] && [ "$catissuenet" == "$mp" ]
+then
+	printf "\033[33;32m PASS \n"
+else
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+#If counter more than 0 then fails
+if [ $counter -gt 0 ]; then
+	printf "\e[31mOverall Fail\e[0m\n"
+	printf "Please run remediation\n"
+else
+	printf "\e[32mOverall Pass\e[0m\n"
+fi
+
