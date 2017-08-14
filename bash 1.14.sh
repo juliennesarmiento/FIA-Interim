@@ -34,7 +34,9 @@ trap ctrl_C INT
 trap ctrl_Z 2 20
 
 ######################
+
 #1.14 sticky bit
+
 printf "\e[1mSetting Sticky Bit on All World-Writable Directories\e[0m\n"
 if df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \(-perm -0002 -a ! -perm -1000 \) 2> /dev/null ; then
 df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \(-perm -0002 -a ! -perm -1000 \) 2> /dev/null | xargs chmod o+t
@@ -47,5 +49,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
