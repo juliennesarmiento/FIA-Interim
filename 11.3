@@ -56,3 +56,12 @@ else
     sed -i /etc/pam.d/system-auth -e' /# User changes will be destroyed the next time authconfig is run./a account\trequired\tpam_faillock.so'
     printf "\e[32mpam_faillock added\e[0m\n"
 fi
+
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
