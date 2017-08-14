@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #3.6 Configure Network Time Protocol (NTP)
+
 printf "\n\e[1mAttempting to configure Network Time Protocol(NTP)\e[0m\n"
 
 if grep '^restrict default' /etc/ntp.conf | grep "restrict default kod nomodify notrap nopeer noquery" &&  grep '^restrict -6 default' /etc/ntp.conf | grep "restrict -6 default kod nomodify notrap nopeer noquery" >/dev/null ; then
@@ -73,5 +74,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
