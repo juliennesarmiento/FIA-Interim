@@ -1,0 +1,20 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}7.18 Check for Duplicate UIDs${normal} \n\n"
+printf "Checking for duplicate UIDs\n"
+#Get etc/passwd file
+cat /etc/passwd| cut -f3 -d":" | sort -n | uniq -c | while read x ; do
+[ -z "${x}" ] && break
+set - $x
+if [ $1 -gt 1 ]; then
+#Checks for duplicate UIDs
+	users=`/bin/gawk -F: '($3 == n) { print $1 }' n=$2 /etc/passwd| /usr/bin/xargs`
+	printf "\e[31mFail - Duplicate UID ($2)\e[0m\n"
+	printf "Please run remediation"
+else
+	printf "\e[32mPass - UID ($2)\e[0m\n"
+fi
+done
