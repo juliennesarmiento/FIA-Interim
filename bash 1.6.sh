@@ -36,6 +36,7 @@ trap ctrl_Z 2 20
 ######################
 
 #1.6 bind mount
+
 printf "\e[1mBinding mount.\e[0m\n"
 printf "/tmp /var/tmp none bind 0 0" >> /etc/fstab
 mount --bind /tmp /var/tmp
@@ -45,5 +46,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
