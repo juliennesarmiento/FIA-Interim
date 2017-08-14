@@ -43,3 +43,11 @@ if [[ $(rpm -q tftp | grep "not installed" >/dev/null && rpm -q tftp-server | gr
 else
 	printf "\e[31mTFTP is installed. Consider replacing with SFTP\e[0m\n"
 fi
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
