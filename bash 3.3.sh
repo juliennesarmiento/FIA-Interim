@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #3.3 Disable Avahi Server
+
 printf "\n\e[1mAttempting to disable Avahi Server.\e[0m\n"
 if systemctl is-active avahi-daemon | grep "active" >/dev/null && systemctl is-enabled avahi-daemon | grep "enabled" >/dev/null ; then
 	printf "\e[34mAvahi Server is not disabled. Attempting to disable now.\e[0m\n"
@@ -49,5 +50,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
