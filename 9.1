@@ -43,3 +43,12 @@ if rpm -q cronie-anacron | grep "not installed" ; then # Install the package if 
 else
     printf "\e[32mNo remediation needed\e[0m\n"
 fi
+
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
