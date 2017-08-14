@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#7.4
+printf "Disabling system accounts:\n"
+RESULT=$(egrep -v "^\+" /etc/passwd | awk -F: '($1!="root" && $1!="sync" && $1!="shutdown" && $1!="halt" && $3<1000 && $7!="/usr/sbin/nologin" && $7!="/sbin/nologin" && $7!="/bin/false")')
+if [ -z $RESULT ]; then
+  printf "\e[32mNo remediation is needed\e[0m\n"
+else
+  usermod -L $RESULT
+  usermod -s /sbin/nologin $RESULT
+  printf "\e[32mRemediation has been completed\e[0m\n"
+fi
