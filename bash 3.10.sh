@@ -36,6 +36,7 @@ trap ctrl_Z 2 20
 ######################
 
 #3.10
+
 printf "\n\e[1mConfiguring Mail Transfer Agent for Local-Only Mode.\e[0m\n"
 if netstat -an | grep LIST | grep ":25[[:space:]]" ; then
 	printf "\e[32mMTA is listening on 127.0.0.1.\e[0m\n"
@@ -57,5 +58,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
