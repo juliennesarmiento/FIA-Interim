@@ -1,0 +1,6 @@
+printf "Checking if legacy file systems are supported on the system: "
+if [[ $(modprobe -n -v [cramfs,freexvfs,jffs2,hfs,hfsplus,squashfs,udf]) ]]; then
+	printf "\e[31mFAIL\e[0m\n"
+else
+	printf "\e[32mPASS\e[0m\n"
+fi
