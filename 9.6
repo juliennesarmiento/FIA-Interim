@@ -1,0 +1,46 @@
+#!/bin/bash 
+
+#######################
+
+reset
+
+if [ "$EUID" -ne 0 ] ; then
+  printf "\e[31mPlease run as root!\n"
+  printf "Press any key to exit\e[0m\n"
+  read -n 1 -s
+  exit
+fi
+
+if [ -e /etc/redhat-release ] ; then
+  printf "\e[1mRunning Scan for "
+  printf "$(cat /etc/redhat-release)"
+  printf "\e[0m\n"
+else
+  printf "\e[31m\e[1mYou are not on a Red Hat System!\n"
+  printf "Press any key to exit\e[0m\n"
+  read -n 1 -s
+  kill -9 $PPID
+fi
+
+function ctrl_C() {
+  kill -9 $PPID  
+}
+
+function ctrl_Z() {
+  kill -9 $PPID
+}
+
+trap ctrl_C INT
+trap ctrl_Z 2 20
+
+######################
+
+#9.6 Set User/Group Owner and Permission on /etc/cron.d
+printf "Checking if the /etc/cron.d directory has the correct permissions:\n"
+if ls -ld /etc/cron.d | grep -e drwx------ ; then # Modify the file permissions to allow only users to read, write and execute
+    printf "\e[32mNo remediation needed\e[0m\n"
+else
+    chown root:root /etc/cron.d
+    chmod og-rwx /etc/cron.d
+    printf "\e[32mChanged to correct permission\e[0m\n"
+fi
