@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #3.2 Remove X Window System	
+
 printf "\n\e[1mAttempting to remove X Window System.\e[0m\n"
 yum -y remove xorg-x11-server-common
 printf "\n\e[1mChanging boot target.\e[0m\n"
@@ -51,5 +52,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
