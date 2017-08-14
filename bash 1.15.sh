@@ -34,7 +34,9 @@ trap ctrl_C INT
 trap ctrl_Z 2 20
 
 ######################
+
 #1.15 legacy filesystems
+
 printf "\e[1mDisabling mounting of Legacy Filesystems.\e[0m\n"
 printf "install cramfs /bin/true\n" > /etc/modprobe.d/CIS.conf
 printf "install freevxfs /bin/true\n" >> /etc/modprobe.d/CIS.conf
@@ -49,5 +51,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
