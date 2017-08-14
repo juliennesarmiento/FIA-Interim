@@ -43,3 +43,11 @@ if [[ $(grep "[[:space:]]/var/log[[:space:]]" /etc/fstab) ]] ; then
 else
 	printf "\e[31mFAIL\e[0m\n"
 fi
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
