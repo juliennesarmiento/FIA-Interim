@@ -1,0 +1,6 @@
+printf "Checking if TFTP is not installed: "
+if [[ $(rpm -q tftp | grep "not installed" >/dev/null && rpm -q tftp-server | grep "not installed") ]] ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mTFTP is installed. Consider replacing with SFTP\e[0m\n"
+fi
