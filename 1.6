@@ -1,0 +1,7 @@
+#grep -e is to tell grep that the string contains regular expressions
+printf "Checking if /var/tmp is bound to /tmp: "
+if [[ $(grep -e "^/tmp[[:space:]]" /etc/fstab | grep "/var/tmp") ]] ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mFAIL\e[0m\n"
+fi
