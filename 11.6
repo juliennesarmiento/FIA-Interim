@@ -12,3 +12,11 @@ printf "\e[0m Users that are allowed to issue su command: \n "
 echo -en "\033[33;31m" > /dev/null
 cat /etc/group | grep wheel | cut -d : -f 4 #Grep "wheel" from /etc/group and cut out the 4th field 
 echo  -en "\e[0m"
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
