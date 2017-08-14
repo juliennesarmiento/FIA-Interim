@@ -1,0 +1,534 @@
+#! /bin/bash
+clear
+
+printf "7.1 Set Password Expiration Days\n"
+printf "Checking user account defaults: (Password Max Days)\n"
+maxDays=$(grep ^PASS_MAX_DAYS /etc/login.defs | grep -o '[0-9]*')
+if [ $maxDays -le 90 ]; then
+	printf "\e[32m$maxDays Pass\e[0m\n"
+else
+	printf "\e[31m$maxDays Fail\e[0m\n"
+	printf "Please run remediation\n"
+fi
+USER=$(cat /etc/passwd | grep "/bin/bash" | cut -d : -f 1)
+list=(${USER})
+printf "Checking existing user accounts: (Password Max Days)\n"
+for i in "${list[@]}"
+do
+	day=$(chage -l $i | grep "Maximum number" | cut -d : -f 2)
+	if [ $day -le 90 ]; then 
+		printf "\e[32m$i $day Pass\e[0m\n"
+	else
+		printf "\e[31m$i $day Fail\e[0m\n"
+		printf "Please run remediation\n"
+	fi
+done
+
+
+printf "\n7.2 Set Password Change Minimum Number of Days\n"
+printf "Checking user account defaults: (Password Min Days)\n"
+minDays=$(grep ^PASS_MIN_DAYS /etc/login.defs | grep -o '[0-9]*')
+if [ $minDays -ge 7 ]; then
+	printf "\e[32m$minDays Pass\e[0m\n"
+else
+	printf "\e[31m$minDays Fail\e[0m\n"
+	printf "Please run remediation\n"
+fi
+USER=$(cat /etc/passwd | grep "/bin/bash" | cut -d : -f 1)
+list=(${USER})
+printf "Checking existing user accounts: (Password Min Days)\n"
+for i in "${list[@]}"
+do
+	day=$(chage -l $i | grep "Minimum number" | cut -d : -f 2)
+	if [ $day -ge 7 ]; then 
+		printf "\e[32m$i $day Pass\e[0m\n"
+	else
+		printf "\e[31m$i $day Fail\e[0m\n"
+		printf "Please run remediation\n"
+	fi
+done
+
+
+printf "\n7.3 Set Password Expiring Warning Days\n"
+printf "Checking user account defaults: (Password Exp Warning Days)\n"
+expDays=$(grep ^PASS_WARN_AGE /etc/login.defs | grep -o '[0-9]*')
+if [ $expDays -ge 7 ]; then
+	printf "\e[32m$expDays Pass\e[0m\n"
+else
+	printf "\e[31m$expDays Fail\e[0m\n"
+	printf "Please run remediation\n"
+fi
+USER=$(cat /etc/passwd | grep "/bin/bash" | cut -d : -f 1)
+list=(${USER})
+printf "Checking existing user accounts: (Password Exp Warning Days)\n"
+for i in "${list[@]}"
+do
+	day=$(chage -l $i | grep "warning" | cut -d : -f 2)
+	if [ $day -ge 7 ]; then 
+		printf "\e[32m$i $day Pass\e[0m\n"
+	else
+		printf "\e[31m$i $day Fail\e[0m\n"
+		printf "Please run remediation\n"
+	fi
+done
+
+
+printf "\n7.4 Disable User Accounts\n"
+RESULT=$(egrep -v "^\+" /etc/passwd | awk -F: '($1!="root" && $1!="sync" && $1!="shutdown" && $1!="halt" && $3<1000 && $7!="/usr/sbin/nologin" && $7!="/sbin/nologin" && $7!="/bin/false")')
+if [ -z $RESULT ]; then
+  printf "\e[32mSuccessful\e[0m\n"
+else
+  printf "\e[31mYour account should be locked! Please run remediation!\e[0m\n"
+  egrep -v "^\+" /etc/passwd | awk -F: '($1!="root" && $1!="sync" && $1!="shutdown" && $1!="halt" && $3<1000 && $7!="/usr/sbin/nologin" && $7!="/sbin/nologin")' |  cut -d : -f 1 
+fi
+
+
+printf "\n7.5 Set Default Group for root Account\n"
+printf "Checking for root's default group\n"
+DGROUP=$(grep "^root:" /etc/passwd | cut -f4 -d:)
+if [ "$DGROUP" -eq 0 ]; then
+	printf "\033[33;32m PASS \n"
+else
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+
+
+printf "\n7.6 Set Default umask for Users\n"
+printf "Checking umask for users\n "
+if grep "umask 077" /etc/bashrc | grep "umask 077" /etc/profile.d/* >/dev/null; then
+	printf "\033[33;32mPASSED, umask is already set to 077. \n"
+else
+	printf "\033[33;31mFAILED, please set umask to 077. \n"
+fi 
+echo  -en "\e[0m"
+
+
+printf "\n7.7 Lock Inactive User Accounts\n"
+printf "Checking for days until accounts deactivates\n"
+if useradd -D | grep INACTIVE=35 >/dev/null; then
+	printf "\033[33;32m PASS \n"
+else
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+
+
+printf "\n7.8 Ensure Password Fields are Not Empty\n"
+printf "Checking that password fields are not empty"
+PFieldsNEmpty= $(cat /etc/shadow | awk -F: '($2 == "" ) { print $1 " does not have a password "}')
+echo $PFieldsNEmpty
+if [ -z "$PFieldsNEmpty" ]; then
+	printf "\033[33;32m PASS \n"
+else
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+
+
+printf "\n7.9 Verify No Legacy "+" Entries Exist in /etc/passwd, /etc/shadow and /etc/group files\n"
+printf "Checking that no Legacy Entries exist in etc/passwd, /etc/shadow and /etc/group files\n"
+PASSWD=$(grep '^+:' /etc/passwd)
+SHADOW=$(grep '^+:' /etc/shadow)
+GROUP=$(grep '^+:' /etc/group)
+#echo $PASSWD
+#echo $SHADOW
+#echo $GROUP
+if [ -z "$PASSWD" ] && [ -z "$SHADOW" ] && [ -z "$GROUP" ]; then
+	printf "\033[33;32m PASS \n"
+else
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+
+
+printf "\n7.10 Verify No UID 0 Accounts Exist Other Than root\n"
+printf "Checking that no UID 0 exist besides root\n"
+VerifyUIDRoot=$(/bin/cat /etc/passwd | /bin/awk -F: '($3 == 0){print $1}')
+if [ "$VerifyUIDRoot" = 'root' ]
+then
+	printf "\033[33;32m PASS \n"
+else
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+
+
+printf "\n7.11 Ensure root PATH Integrity\n"
+printf "Checking root path integrity\n"
+if [ "`echo $PATH | grep :: `" != "" ]; then
+	echo "Empty Directory in PATH (::)"
+fi
+p=`echo $PATH | sed -e 's/::/:/' -e 's/:$//' -e 's/:/ /g'`
+set -- $p
+while [ "$1" != "" ]; do
+	if [ "$1" = "." ]; then
+		echo "PATH contains ."
+		shift
+		continue
+	fi
+	if [ -d $1 ]; then
+		perm6=$(ls -ldH $1 | grep "^.....w....")
+		perm9=$(ls -ldH $1 | grep "^........w.")
+		if [ -z "$perm6" ]; then
+			printf "\e[32mPass - Group Write permission not set on directory $1\e[0m\n"
+		else
+			printf "\e[31mFail - Group Write permission set on directory $1\e[0m\n"
+			printf "Please run remediation\n"
+		fi
+		if [ -z "$perm9" ]; then
+			printf "\e[32mPass - Other Write permission not set on directory $1\e[0m\n"
+		else
+			printf "\e[31mFail - Other Write permission set on directory $1\e[0m\n"
+			printf "Please run remediation\n"
+		fi
+		dirown=`ls -ldH $1 | awk '{print $3}'`
+		if [ "$dirown" == "root" ] ; then
+			printf "\e[32mPass - $1 is owned by root\e[0m\n\n"
+		else
+			printf "\e[31mFail - $1 is not owned by root\e[0m\n"
+			printf "Please run remediation\n\n"
+		fi
+	else
+		printf "\e[31m$1 is not a directory\e[0m\n"
+	fi
+shift
+done
+
+
+printf "\n7.12 Check Permissions on User Home Directories\n"
+for RESULT in `cat /etc/passwd | egrep -v '(root|halt|sync|shutdown)' |awk -F: '($7!="/usr/sbin/nologin" && $7!="/sbin/nologin" && $7!="/bin/false") { print $6 }'`; do
+resultperm=$(ls -ld $RESULT)
+if [[ ` echo $resultperm | grep "^......w..." ` ]]; then 
+	echo "Fail, Group Write permission is set on directory $RESULT"
+else
+	echo "Pass, Group Write permission is not set on directory $RESULT"
+fi
+if [[ ` echo $resultperm | grep "^.......-.." `  ]]; then
+	echo "Pass, Other Read permission is not set on directory $RESULT"
+else
+	echo "Fail, Other Read permission is set on directory $RESULT"
+fi
+if [[ `echo $resultperm | grep "^........-."` ]]; then
+	echo "Pass, Other Write permission is not set on directory $RESULT"
+else
+	echo "Fail, Other Write permission is set on directory $RESULT"
+fi
+if [[ `echo $resultperm | grep "^.........-"` ]]; then
+	echo "Pass, Other Execute permission is not set on directory $RESULT"
+else
+	echo "Fail, Other Execute permission is set on directory $RESULT"
+fi
+done
+
+
+printf "\n7.13 Check User Dot File Permissions\n"
+printf "Checking user dot file permissions\n"
+for dir in `cat /etc/passwd | egrep -v '(root|sync|halt|shutdown)' | awk -F: '($7 != "/sbin/nologin" && $7 != "/usr/sbin/nologin" && $7 != "/bin/false") { print $6 }'`; do
+for file in $dir/.[A-Za-z0-9]*; do
+perm6=$(ls -ld $file | grep "^.....w....")
+perm9=$(ls -ld $file | grep "^........w.")
+if [ -z "$perm6" ] && [ -z "$perm9" ]; then
+	printf "\e[32mPass - $file\e[0m\n"
+else
+	printf "\e[31mFail - $file\e[0m\n"
+	printf "Please run remediation\n"
+fi
+done
+done
+
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+printf "\n \033[0;30m${bold}7.14 Checking for Existence and Permission of User .netrc Files${normal} \n\n" 
+
+#Determines the home directory of interactive users.
+for dir in `/bin/cat /etc/passwd | /bin/egrep -v '(root|halt|sync|shutdown)' |/bin/awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+
+#Searches the home directory of interactive users for .netrc file. 
+for file in $dir/.netrc; do
+if [ ! -h "$file" -a -f "$file" ]; then
+printf "\033[33;30m Found! .netrc file found in directory $dir, checking file permissions... \n"
+else
+printf "\033[33;35m No .netrc file found in directory $dir. \n"
+fi
+
+#Checks the permissions of the .netrc file. 
+if [ ! -h "$file" -a -f "$file" ]; then
+fileperm=`/bin/ls -ld $file | /bin/cut -f1 -d" "`
+
+#Checks the permission granted of Group Read (5th Character) 
+if [ `echo $fileperm | /bin/cut -c5 ` != "-" ]
+then
+printf "\033[33;32m Group Read set on $file. \n"
+else
+printf "\033[33;31m Group Read not set on $file. \n"
+fi
+
+#Checks the permission granted of Group Write (6th Character) 
+if [ `echo $fileperm | /bin/cut -c6 ` != "-" ]
+then
+printf "\033[33;32m Group Write set on $file. \n"
+else
+printf "\033[33;31m Group Write not set on $file. \n"
+fi
+
+#Checks the permission granted of Group Execute (7th Character) 
+if [ `echo $fileperm | /bin/cut -c7 ` != "-" ]
+then
+printf "\033[33;32m Group Execute set on $file. \n"
+else
+printf "\033[33;31m Group Execute not set on $file. \n"
+fi
+
+#Checks the permission granted of Others Read (8th Character) 
+if [ `echo $fileperm | /bin/cut -c8 ` != "-" ]
+then
+printf "\033[33;32m Others Read set on $file. \n"
+else
+printf "\033[33;31m Others Read not set on $file. \n"
+fi
+
+#Checks the permission granted of Others Write (9th Character) 
+if [ `echo $fileperm | /bin/cut -c9 ` != "-" ]
+then
+printf "\033[33;32m Others Write set on $file. \n"
+else
+printf "\033[33;31m Others Write not set on $file. \n"
+fi
+
+#Checks the permission granted of Others Execute (10th Character) 
+if [ `echo $fileperm | /bin/cut -c10 ` != "-" ]
+then
+printf "\033[33;32m Others Execute set on $file. \n"
+else
+printf "\033[33;31m Others Execute not set on $file. \n"
+fi
+fi
+echo  -en "\e[0m \n"
+done
+done
+
+
+printf "\n7.15 Check for Presence of User .rhosts Files\n"
+printf "\033[0;30mChecking for Presence of User .rhosts Files \n"
+for dir in `/bin/cat /etc/passwd | /bin/egrep -v '(root|halt|sync|shutdown)' |/bin/awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+for file in $dir/.rhosts; do
+if [ ! -h "$file" -a -f "$file" ]; then
+printf "\033[33;31m.rhosts file found in $dir, please delete file if it is not needed. \n"
+else
+printf "\033[33;32mNo .rhosts file found in $dir \n"
+fi
+echo  -en "\e[0m"
+done
+done
+
+
+printf "\n7.16 Check Groups in /etc/passwd\n"
+for i in $(cat /etc/passwd | cut -d : -f 4 | sort -u); do 
+	grep -q -P "^.*?:x:$i:" /etc/group
+		if [ $? -ne 0 ]; then 
+			echo "Group $i is referenced by /etc/passwd but does not exists in /etc/group"
+		else
+			printf "\e[32mPass - Group: $i\e[0m\n"
+		fi
+done
+
+
+printf "\n7.17 Check That Users Are Assigned Valid Home Directories and Home Directory Ownership is Correct\n"
+cat /etc/passwd | awk -F : '{print $1, $3, $6}' | while read user uid dir; do 
+	if [ $uid -ge 1000 -a ! -d "$dir" -a $user != "nfsnobody" ]; then 
+		printf "\e[31mHome directory ($dir) of user $user does not exist.\e[0m\n"
+	elif [ ! -d $dir ] ; then
+		printf "\e[31mHome Directory of $user cannot be found!\e[0m\n"
+	else 
+		printf "\e[32mPass - $user $dir\e[0m\n"
+		echo "Checking if Home directory ownership of $user is correct"
+		ls -ld $dir | awk '{print $3, $4}' | while read owner user1; do
+		if [ "$owner" != "$user1" ] && [ $? -eq 0 ]; then
+			printf "\e[31mThe home directory ($dir) of user $user1 is owned by $owner.\e[0m\n"
+		else 
+			printf "\e[32mPass\e[0m\n"
+		fi
+		done
+	fi
+done
+
+
+printf "\n7.18 Check for Duplicate UIDs\n"
+printf "Checking for duplicate UIDs\n"
+cat /etc/passwd| cut -f3 -d":" | sort -n | uniq -c | while read x ; do
+[ -z "${x}" ] && break
+set - $x
+if [ $1 -gt 1 ]; then
+	users=`/bin/gawk -F: '($3 == n) { print $1 }' n=$2 /etc/passwd| /usr/bin/xargs`
+	printf "\e[31mFail - Duplicate UID ($2)\e[0m\n"
+	printf "Please run remediation"
+else
+	printf "\e[32mPass - UID ($2)\e[0m\n"
+fi
+done
+
+
+printf "\n7.19 Check for Duplicate GIDs\n"
+printf "Checking for duplicate GIDs\n"
+cat /etc/group | cut -f3 -d":" | sort -n | uniq -c | while read x ; do
+[ -z "${x}" ] && break
+set - $x
+if [ $1 -gt 1 ]; then
+	grps=`/bin/gawk -F: '($3 == n) { print $1 }' n=$2 /etc/group | /usr/bin/xargs`
+	printf "\e[31mFail - Duplicate GID ($2)\e[0m\n"
+	printf "Please run remediation"
+else
+	printf "\e[32mPass - GID ($2)\e[0m\n"
+fi
+done
+
+
+printf "\n7.20 Check That Reserved UIDs Are Assigned to only System Accounts\n"
+checkUsers="root bin daemon adm lp sync shutdown halt mail news uucp operator games gopher ftp nobody nscd vcsa rpc nscd vcsa rpc mailnull smmsp pcap ntp dbus avahi sshd rpcuser nfsnobody haldaemon avahi-autoipd distcache apache oprofile webalizer dovecot squid named xfs gdm sabayon usbmuxd rtkit abrt saslauth pulse postfix tcpdump"
+cat /etc/passwd | awk -F : '($3 < 500) {print $1, $3}' | while read user uid; do found=0
+for tUser in ${checkUsers}
+	do
+		if [ ${user} = ${tUser} ]; then
+		found=1
+		fi
+	done
+	if [ $found -eq 0 ]; then
+	echo "User $user has a reserved UID ($uid)."
+	fi
+done
+
+
+printf "\n7.21 Check for Duplicate User Names\n"
+cat /etc/passwd | cut -f1 -d":" | /bin/sort -n | /usr/bin/uniq -c | while read x ; do
+[ -z "${x}" ] && break
+set - $x
+if [ $1 -gt 1 ]; then
+uids=`/bin/gawk -F: '($1 == n) { print $3 }' n=$2 \/etc/passwd | xargs`
+printf "\e[31mFail - Duplicate User Name ($2)\e[0m\n"
+printf "Please run remediation"
+else
+printf "\e[32mPass - ($2)\e[0m\n"
+fi
+done
+
+
+printf "\n7.22 Check for Duplicate Group Names\n"
+cat /etc/group | cut -f1 -d":" | /bin/sort -n | /usr/bin/uniq -c | while read x ; do
+[ -z "${x}" ] && break
+set - $x
+if [ $1 -gt 1 ]; then
+gids=`/bin/gawk -F: '($1 == n) { print $3 }' n=$2 /etc/group | xargs`
+printf "\e[31mFail - Duplicate Group Name ($2)\e[0m\n"
+printf "Please run remediation"
+else 
+printf "\e[32mPass - ($2)\e[0m\n"
+fi
+done
+
+
+printf "\n7.23 Check for Presence of User .forward Files\n"
+for dir in `/bin/cat /etc/passwd| /bin/awk -F: '{ print $6 }'`; do
+if [ ! -h "$dir/.forward" -a -f "$dir/.forward" ]; then
+echo ".forward file $dir/.forward exists"
+else 
+printf "\e[32mPass - $dir\e[0m\n"
+fi
+done
+
+
+printf "\n8.1 Set Warning Banner for Standard Login Services\n"
+counter=0
+motdper=$(ls -l /etc/motd | cut -d " " -f 3 )
+motdper1=$(ls -l /etc/motd | cut -d " " -f 4 )
+issueper=$(ls -l /etc/issue | cut -d " " -f 3 )
+issueper1=$(ls -l /etc/issue | cut -d " " -f 4 )
+issuenetper=$(ls -l /etc/issue.net | cut -d " " -f 3 )
+issuenetper1=$(ls -l /etc/issue.net | cut -d " " -f 4 )
+printf "Checking that /etc/motd /etc/issue /etc/issue.net have root as user and group:\n"
+if [ "$motdper" == "root" ] && [ "$motdper1" == "root" ] && [ "$issueper" == "root" ] && [ "$issueper1" == "root" ] && [ "$issuenetper" == "root" ] && [ "$issuenetper1" == "root" ]
+then 
+	printf "\033[33;32m PASS \n"
+else
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+
+fi
+echo  -en "\e[0m"
+chmodmotd=$( stat --format '%a' /etc/motd)
+chmodissue=$( stat --format '%a' /etc/issue)
+chmodissuenet=$( stat --format '%a' /etc/issue.net)
+printf "Checking that /etc/motd /etc/issue /etc/issue.net have chmod of 644 :\n"
+if [ "$chmodmotd" -eq 644 ] && [ "$chmodissue" -eq 644 ] && [ "$chmodissuenet" -eq 644 ]
+then 
+	printf "\033[33;32m PASS \n"
+else	
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+mp="Authorized uses only. All activity may be \ monitored and reported."
+catissue=$(cat /etc/issue)
+catissuenet=$(cat /etc/issue.net)
+printf "Checking that /etc/issue /etc/issue.net have proper motd :\n"
+if [ "$catissue" == "$mp" ] && [ "$catissuenet" == "$mp" ]
+then
+	printf "\033[33;32m PASS \n"
+else
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+fi
+echo  -en "\e[0m"
+if [ $counter -gt 0 ]; then
+	printf "\e[31mOverall Fail\e[0m\n"
+	printf "Please run remediation\n"
+else
+	printf "\e[32mOverall Pass\e[0m\n"
+fi
+
+
+printf "\n8.2 Remove OS information from Login Banners\n"
+issue=$(egrep '(\\v|\\r|\\m|\\s)' /etc/issue)
+motd=$(egrep '(\\v|\\r|\\m|\\s)' /etc/motd)
+issuenet=$(egrep '(\\v|\\r|\\m|\\s)' /etc/issue.net)
+regex='(\\v|\\r|\\m|\\s)'
+counter=0
+#echo $issue
+printf "Checking /etc/issue:\n"
+if [[ $issue =~ $regex ]]
+then 
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+else
+	printf "\033[33;32m PASS \n"
+fi
+echo  -en "\e[0m"
+#echo $motd
+printf "Checking /etc/motd:\n"
+if [[ $motd =~ $regex ]]
+then 
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+else
+	printf "\033[33;32m PASS \n"
+
+fi
+echo  -en "\e[0m"
+#echo $issuenet
+printf "Checking /etc/issue.net:\n"
+if [[ $issuenet =~ $regex ]]
+then 
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+else
+	printf "\033[33;32m PASS \n"
+fi
+echo  -en "\e[0m"
+#echo $counter
+if [ $counter -gt 0 ]; then
+	printf "\e[31mOverall Fail\e[0m\n"
+	printf "Please run remediation\n"
+else
+	printf "\e[32mOverall Pass\e[0m\n"
+fi
