@@ -1,0 +1,55 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}8.2 Remove OS information from Login Banners${normal} \n\n"
+#Greps if match 3 files
+issue=$(egrep '(\\v|\\r|\\m|\\s)' /etc/issue)
+motd=$(egrep '(\\v|\\r|\\m|\\s)' /etc/motd)
+issuenet=$(egrep '(\\v|\\r|\\m|\\s)' /etc/issue.net)
+#Set regular expression and counter
+regex='(\\v|\\r|\\m|\\s)'
+counter=0
+#echo $issue
+#Checks if match regex
+printf "Checking /etc/issue:\n"
+if [[ $issue =~ $regex ]]
+then 
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+else
+	printf "\033[33;32m PASS \n"
+fi
+echo  -en "\e[0m"
+#echo $motd
+#Checks if match regex
+printf "Checking /etc/motd:\n"
+if [[ $motd =~ $regex ]]
+then 
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+else
+	printf "\033[33;32m PASS \n"
+
+fi
+echo  -en "\e[0m"
+#echo $issuenet
+#Checks if match regex
+printf "Checking /etc/issue.net:\n"
+if [[ $issuenet =~ $regex ]]
+then 
+	counter=$((counter+1))
+	printf "\033[33;31m FAIL \n"
+else
+	printf "\033[33;32m PASS \n"
+fi
+echo  -en "\e[0m"
+#echo $counter
+#Checks if counter greater than 0
+if [ $counter -gt 0 ]; then
+	printf "\e[31mOverall Fail\e[0m\n"
+	printf "Please run remediation\n"
+else
+	printf "\e[32mOverall Pass\e[0m\n"
+fi
