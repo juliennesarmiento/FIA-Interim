@@ -1,0 +1,14 @@
+printf "Checking if daytime-dgram is disabled: "
+if [[ $(chkconfig --list daytime-dgram 2>/dev/null | grep "daytime-dgram[[:space:]]off") ]] ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mFAIL\e[0m\n"
+fi
+
+printf "Checking if daytime-stream is disabled: "
+if [[ $(chkconfig --list daytime-stream 2>/dev/null | grep "daytime-stream[[:space:]]off") ]] ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mFAIL\e[0m\n"
+fi
+
