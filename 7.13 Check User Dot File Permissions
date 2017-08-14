@@ -1,0 +1,21 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}7.13 Check User Dot File Permissions${normal} \n\n"
+#For loop to get hidden files in the user's home directory
+printf "Checking user dot file permissions\n"
+for dir in `cat /etc/passwd | egrep -v '(root|sync|halt|shutdown)' | awk -F: '($7 != "/sbin/nologin" && $7 != "/usr/sbin/nologin" && $7 != "/bin/false") { print $6 }'`; do
+for file in $dir/.[A-Za-z0-9]*; do
+#Checks that 6th and 9th character of permissions are not 'w'
+perm6=$(ls -ld $file | grep "^.....w....")
+perm9=$(ls -ld $file | grep "^........w.")
+if [ -z "$perm6" ] && [ -z "$perm9" ]; then
+	printf "\e[32mPass - $file\e[0m\n"
+else
+	printf "\e[31mFail - $file\e[0m\n"
+	printf "Please run remediation\n"
+fi
+done
+done
