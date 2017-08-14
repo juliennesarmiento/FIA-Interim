@@ -34,6 +34,7 @@ trap ctrl_Z 2 20
 #Part 1
 
 #create new hard disk first
+
 printf "\e[1mCreating new hard disk\e[0m\n"
 printf "\e[1m\nPLEASE CREATE A NEW HARD DISK WITH 20GB. This will create /dev/sdb.\e[0m\n"
 parted -s /dev/sdb mklabel msdos #makes an MSDOS partition table 
@@ -46,5 +47,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
