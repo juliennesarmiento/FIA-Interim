@@ -1,0 +1,34 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}7.12 Check Permissions on User Home Directories${normal} \n\n"
+#For loop to get accounts that can log in interactively to the system
+for RESULT in `cat /etc/passwd | egrep -v '(root|halt|sync|shutdown)' |awk -F: '($7!="/usr/sbin/nologin" && $7!="/sbin/nologin" && $7!="/bin/false") { print $6 }'`; do
+resultperm=$(ls -ld $RESULT)
+#Checks that 6th character of permissions is not 'w'
+if [[ ` echo $resultperm | grep "^......w..." ` ]]; then 
+	echo "Fail, Group Write permission is set on directory $RESULT"
+else
+	echo "Pass, Group Write permission is not set on directory $RESULT"
+fi
+#Checks that 8th character of permissions is '-'
+if [[ ` echo $resultperm | grep "^.......-.." `  ]]; then
+	echo "Pass, Other Read permission is not set on directory $RESULT"
+else
+	echo "Fail, Other Read permission is set on directory $RESULT"
+fi
+#Checks that 9th character of permissions is '-'
+if [[ `echo $resultperm | grep "^........-."` ]]; then
+	echo "Pass, Other Write permission is not set on directory $RESULT"
+else
+	echo "Fail, Other Write permission is set on directory $RESULT"
+fi
+#Check that 10th character of permissions is '-'
+if [[ `echo $resultperm | grep "^.........-"` ]]; then
+	echo "Pass, Other Execute permission is not set on directory $RESULT"
+else
+	echo "Fail, Other Execute permission is set on directory $RESULT"
+fi
+done
