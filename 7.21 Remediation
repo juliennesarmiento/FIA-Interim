@@ -1,4 +1,0 @@
-#!/bin/bash
-
-#7.21
-printf "Establish unique user names for the users."
