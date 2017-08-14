@@ -1,0 +1,6 @@
+printf "Checking if tcpmux-server is disabled: "
+if [[ $(chkconfig --list tcpmux-serer 2>/dev/null | grep "tcpmux-server[[:space:]]off") ]]  ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mFAIL\e[0m\n"
+fi
