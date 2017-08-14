@@ -36,6 +36,7 @@ trap ctrl_Z 2 20
 ######################
 
 #1.1-1.4 /tmp
+
 printf "\e[1mCreating separate /tmp partition and setting options.\e[0m\n"
 if lvcreate -l 10%VG -n tmp rhel ; then
 	echo "/dev/rhel/tmp	/tmp	ext4	nodev,nosuid,noexec	0 0" >> /etc/fstab
@@ -48,5 +49,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
