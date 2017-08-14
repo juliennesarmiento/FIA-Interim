@@ -1,0 +1,16 @@
+printf "Checking if Mail Transfer Agent is Local-Only: "
+if [ "$(netstat -an | grep LIST | grep ':25[[:space:]]' | wc -l)" -lt 3 ] ; then
+	if [ "$(netstat -an | grep LIST | grep ':25[[:space:]]' | wc -l)" -eq 2 ] ; then
+		if [[ $(netstat -an | grep LIST | grep ':25[[:space:]]' | grep "127.0.0.1:25") ]] && [[ $(netstat -an | grep LIST | grep ':25[[:space:]]' | grep "::1:25") ]] ; then
+			printf "\e[32mMTA is Local-Only\e[0m\n"
+		else
+			printf "\e[31mMTA is not Local-Only\e[0m\n"
+		fi
+	elif [[ $(netstat -an | grep LIST | grep ':25[[:space:]]' | grep "127.0.0.1") ]] ; then
+		printf "\e[32mMTA is Local-Only\e[0m\n"
+	else
+		printf "\e[31mMTA is not Local-Only\e[0m\n"
+	fi
+else
+	printf "\e[31mMTA is not Local-Only\e[0m\n"
+fi
