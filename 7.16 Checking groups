@@ -1,0 +1,16 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}7.16 Check Groups in /etc/passwd${normal} \n\n"
+#For every row in /etc/passwd
+for i in $(cat /etc/passwd | cut -d : -f 4 | sort -u); do 
+#Verifies GID defined in /etc/group
+	grep -q -P "^.*?:x:$i:" /etc/group
+		if [ $? -ne 0 ]; then 
+			echo "Group $i is referenced by /etc/passwd but does not exists in /etc/group"
+		else
+			printf "\e[32mPass - Group: $i\e[0m\n"
+		fi
+done
