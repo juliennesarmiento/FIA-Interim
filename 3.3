@@ -1,0 +1,6 @@
+printf "Checking if Avahi Daemon is disabled: "
+if [[ $(systemctl is-active avahi-daemon | grep "active") ]] || [[ $(systemctl is-enabled avahi-daemon | grep "enabled") ]] ; then
+	printf "\e[31mFAIL\e[0m\n"
+else
+	printf "\e[32mPASS\e[0m\n"
+fi
