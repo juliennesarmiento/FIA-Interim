@@ -47,3 +47,12 @@ if [[ $(yum list ntp &>/dev/null | grep "Installed Packages") ]] ; then
 else
 	printf "NTP is not installed. Skipping checks..."
 fi
+
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
