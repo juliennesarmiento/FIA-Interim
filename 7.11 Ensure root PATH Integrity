@@ -1,0 +1,49 @@
+#! /bin/bash
+clear
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+printf "\n \033[0;30m${bold}7.11 Ensure root PATH Integrity${normal} \n\n"
+#Checks that none of the path entries are empty
+printf "Checking root path integrity\n"
+if [ "`echo $PATH | grep :: `" != "" ]; then
+	echo "Empty Directory in PATH (::)"
+fi
+#Checks that none of the path entries is a '.'
+p=`echo $PATH | sed -e 's/::/:/' -e 's/:$//' -e 's/:/ /g'`
+set -- $p
+while [ "$1" != "" ]; do
+	if [ "$1" = "." ]; then
+		echo "PATH contains ."
+		shift
+		continue
+	fi
+#Checks that 6th and 9th character of permissions are not 'w'
+	if [ -d $1 ]; then
+		perm6=$(ls -ldH $1 | grep "^.....w....")
+		perm9=$(ls -ldH $1 | grep "^........w.")
+		if [ -z "$perm6" ]; then
+			printf "\e[32mPass - Group Write permission not set on directory $1\e[0m\n"
+		else
+			printf "\e[31mFail - Group Write permission set on directory $1\e[0m\n"
+			printf "Please run remediation\n"
+		fi
+		if [ -z "$perm9" ]; then
+			printf "\e[32mPass - Other Write permission not set on directory $1\e[0m\n"
+		else
+			printf "\e[31mFail - Other Write permission set on directory $1\e[0m\n"
+			printf "Please run remediation\n"
+		fi
+#Checks if owner is root
+		dirown=`ls -ldH $1 | awk '{print $3}'`
+		if [ "$dirown" == "root" ] ; then
+			printf "\e[32mPass - $1 is owned by root\e[0m\n\n"
+		else
+			printf "\e[31mFail - $1 is not owned by root\e[0m\n"
+			printf "Please run remediation\n\n"
+		fi
+	else
+		printf "\e[31m$1 is not a directory\e[0m\n"
+	fi
+shift
+done
