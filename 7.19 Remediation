@@ -1,4 +1,0 @@
-#!/bin/bash
-
-#7.19
-printf "Establish unique GIDs and review all files owned by the shared GID to determine which group they are supposed to belong to."
