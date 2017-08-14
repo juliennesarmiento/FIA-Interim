@@ -1,0 +1,6 @@
+printf "Checking if RSH is not installed: "
+if [[ $(rpm -q rsh-server | grep "not installed" >/dev/null && rpm -q rsh | grep "not installed") ]] ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mRSH is installed. Replace with SSH\e[0m\n"
+fi
