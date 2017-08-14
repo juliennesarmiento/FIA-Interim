@@ -1,0 +1,6 @@
+printf "Checking if NFS and RPC are disabled: "
+if [[ $(systemctl is-enabled nfs-lock | grep "enabled") ]] && [[ $(systemctl is-enabled nfs-secure | grep "enabled") ]] && [[ $(systemctl is-enabled rpcbind | grep "enabled") ]] && [[ $(systemctl is-enabled nfs-idmap | grep "enabled") ]] && [[ $(systemctl is-enabled nfs-secure-server | grep "enabled") ]] ; then
+	printf "\e[31mNFS and RPC are enabled. Disable if not needed\e[0m\n"
+else
+	printf "\e[32mNFS and RPC are disabled\e[0m\n"
+fi
