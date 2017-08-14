@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #3.7 Remove LDAP
+
 printf "\n\e[1mAttempting to remove Lightweight Directory Access Protocol(LDAP)if existing.\e[0m\n"
 yum -y erase openldap-clients
 yum -y erase openldap-servers
@@ -44,5 +45,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
