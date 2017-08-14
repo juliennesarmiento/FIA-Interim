@@ -34,7 +34,9 @@ trap ctrl_C INT
 trap ctrl_Z 2 20
 
 ######################
+
 #1.9-1.10 /home
+
 printf "\e[1mCreating separate partition for /home and setting options.\e[0m\n"
 if lvcreate -l 10%VG -n home rhel ; then
 	echo "/dev/rhel/home	/home	ext4	nodev	0 0" >> /etc/fstab
@@ -47,5 +49,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
