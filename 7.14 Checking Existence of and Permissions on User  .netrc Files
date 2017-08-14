@@ -1,0 +1,72 @@
+#! /bin/bash
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+printf "\n \033[0;30m${bold}Checking for Existence and Permission of User .netrc Files${normal} \n\n" 
+
+#Determines the home directory of interactive users.
+for dir in `/bin/cat /etc/passwd | /bin/egrep -v '(root|halt|sync|shutdown)' |/bin/awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+
+#Searches the home directory of interactive users for .netrc file. 
+for file in $dir/.netrc; do
+if [ ! -h "$file" -a -f "$file" ]; then
+printf "\033[33;30m Found! .netrc file found in directory $dir, checking file permissions... \n"
+else
+printf "\033[33;35m No .netrc file found in directory $dir. \n"
+fi
+
+#Checks the permissions of the .netrc file. 
+if [ ! -h "$file" -a -f "$file" ]; then
+fileperm=`/bin/ls -ld $file | /bin/cut -f1 -d" "`
+
+#Checks the permission granted of Group Read (5th Character) 
+if [ `echo $fileperm | /bin/cut -c5 ` != "-" ]
+then
+printf "\033[33;32m Group Read set on $file. \n"
+else
+printf "\033[33;31m Group Read not set on $file. \n"
+fi
+
+#Checks the permission granted of Group Write (6th Character) 
+if [ `echo $fileperm | /bin/cut -c6 ` != "-" ]
+then
+printf "\033[33;32m Group Write set on $file. \n"
+else
+printf "\033[33;31m Group Write not set on $file. \n"
+fi
+
+#Checks the permission granted of Group Execute (7th Character) 
+if [ `echo $fileperm | /bin/cut -c7 ` != "-" ]
+then
+printf "\033[33;32m Group Execute set on $file. \n"
+else
+printf "\033[33;31m Group Execute not set on $file. \n"
+fi
+
+#Checks the permission granted of Others Read (8th Character) 
+if [ `echo $fileperm | /bin/cut -c8 ` != "-" ]
+then
+printf "\033[33;32m Others Read set on $file. \n"
+else
+printf "\033[33;31m Others Read not set on $file. \n"
+fi
+
+#Checks the permission granted of Others Write (9th Character) 
+if [ `echo $fileperm | /bin/cut -c9 ` != "-" ]
+then
+printf "\033[33;32m Others Write set on $file. \n"
+else
+printf "\033[33;31m Others Write not set on $file. \n"
+fi
+
+#Checks the permission granted of Others Execute (10th Character) 
+if [ `echo $fileperm | /bin/cut -c10 ` != "-" ]
+then
+printf "\033[33;32m Others Execute set on $file. \n"
+else
+printf "\033[33;31m Others Execute not set on $file. \n"
+fi
+fi
+echo  -en "\e[0m \n"
+done
+done
