@@ -1,0 +1,7 @@
+printf "Checking if DHCPD is removed: "
+if [[ $(yum list dhcpd &>/dev/null | grep "Installed Packages") ]] ; then
+	printf "\e[31mDHCPD is installed. Remove if not needed\e[0m\n"
+else
+	printf "\e[32mDHCPD is not installed\e[0m\n"
+fi
+
