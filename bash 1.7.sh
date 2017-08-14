@@ -34,7 +34,9 @@ trap ctrl_C INT
 trap ctrl_Z 2 20
 
 ######################
+
 #1.7 /var/log
+
 printf "\e[1mCreating separate partition for /var/log\e[0m\n"
 if lvcreate -l 10%VG -n log rhel ; then
 	ln -s /log /var/log
@@ -48,5 +50,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
