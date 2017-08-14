@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #3.9 Remove DNS, FTP, HTTP, HTTP-Proxy, SNMP
+
 printf "\n\e[1mAttempting to disable DNS\e[0m\n"
 if systemctl is-enabled named | grep "enabled" >/dev/null && systemctl is-active named | grep "active" >/dev/null; then
 	printf "\e[31mDNS is not disabled. Attempting to disable.\e[0m\n"
@@ -71,5 +72,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
