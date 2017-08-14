@@ -1,0 +1,6 @@
+printf "Checking if /tmp has nosuid: "
+if [[ $(grep "[[:space:]]/tmp[[:space:]]" /etc/fstab | grep "nosuid") ]] ; then
+	printf "\e[32mPASS\e[0m\n"
+else
+	printf "\e[31mFAIL\e[0m\n"
+fi
