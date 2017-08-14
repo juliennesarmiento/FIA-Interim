@@ -35,6 +35,7 @@ trap ctrl_Z 2 20
 
 ######################
 #2.5
+
 printf "\e[1mRemove xinetd\e[0m\n"
 if yum list xinetd | grep "Installed Packages" >/dev/null ; then
 	printf "\e[31mXinetd installed. Attempting to remove.\e[0m\n"
@@ -48,5 +49,6 @@ printf "\e[32mCompleted!\n"
 printf "Press any key to exit\e[0m\n"
 
 #This kills the process, please remove if not needed.
+
 read -n 1 -s
 kill -9 $PPID
