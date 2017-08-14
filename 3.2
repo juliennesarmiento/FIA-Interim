@@ -43,3 +43,12 @@ if [[ $(systemctl get-default | grep "graphical.target") ]] ; then
 else
 	printf "\e[31mGUI is not the default boot target - please check and decide if X11 can be removed\e[0m\n"
 fi
+
+
+printf "\e[32mCompleted!\n"
+printf "Press any key to exit\e[0m\n"
+
+#This kills the process, please remove if not needed.
+
+read -n 1 -s
+kill -9 $PPID
